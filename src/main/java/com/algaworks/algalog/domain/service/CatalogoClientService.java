@@ -3,6 +3,7 @@ package com.algaworks.algalog.domain.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.algaworks.algalog.domain.exception.NegocioExeception;
 import com.algaworks.algalog.domain.model.Cliente;
 import com.algaworks.algalog.domain.repository.ClienteRepository;
 
@@ -16,6 +17,12 @@ public class CatalogoClientService {
 	
 	@Transactional
 	public Cliente salvar(Cliente cliente) {
+		boolean emailEmuso = clienteRepository.findByEmail(cliente.getEmail())
+				.stream()
+				.anyMatch(c -> !c.equals(cliente));
+		if (emailEmuso) {
+			throw new NegocioExeception("Já existe um cliente cadastrado com este e-mail.");
+		}
 		return clienteRepository.save(cliente);
 	}
 	
